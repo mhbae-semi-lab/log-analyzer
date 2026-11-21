@@ -1,0 +1,443 @@
+{
+ "summary": {
+  "model": "qwen2.5:3b",
+  "runs": 30,
+  "date": "2026-11-21",
+  "firstTryPass": 22,
+  "passAfterRetry": 6,
+  "fallback": 2,
+  "fallbackRate": 0.067,
+  "agreeWithRules": 23,
+  "agreeRate": 0.821,
+  "failureReasons": {
+   "fake_line": 15
+  },
+  "medianSec": 6.8,
+  "totalMin": 3.5,
+  "byLang": {
+   "ko": {
+    "runs": 15,
+    "fallback": 1
+   },
+   "en": {
+    "runs": 15,
+    "fallback": 1
+   }
+  }
+ },
+ "rows": [
+  {
+   "code": "C402",
+   "lang": "ko",
+   "lookbackMin": 5,
+   "poolLines": 39,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 7.8,
+   "reasons": [],
+   "llmTop": "CAMERA Exposure auto-adjusted"
+  },
+  {
+   "code": "L103",
+   "lang": "ko",
+   "lookbackMin": 5,
+   "poolLines": 43,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 8.6,
+   "reasons": [],
+   "llmTop": "LOADER의 Vacuum pressure low"
+  },
+  {
+   "code": "S301",
+   "lang": "ko",
+   "lookbackMin": 5,
+   "poolLines": 25,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 6.7,
+   "reasons": [],
+   "llmTop": "모터 온도가 높아지면서 발생하는 알람"
+  },
+  {
+   "code": "C401",
+   "lang": "ko",
+   "lookbackMin": 5,
+   "poolLines": 80,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 8.8,
+   "reasons": [],
+   "llmTop": "CAMERA의 Exposure gain 설정이 너무 높아짐"
+  },
+  {
+   "code": "L104",
+   "lang": "ko",
+   "lookbackMin": 5,
+   "poolLines": 40,
+   "valid": true,
+   "attempts": 2,
+   "firstTry": false,
+   "agree": false,
+   "sec": 10.4,
+   "reasons": [
+    "fake_line"
+   ],
+   "llmTop": "CAMERA의 Exposure auto-adjusted로 인해 L104 Door open 알람이 발생"
+  },
+  {
+   "code": "C402",
+   "lang": "ko",
+   "lookbackMin": 10,
+   "poolLines": 42,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 10.7,
+   "reasons": [],
+   "llmTop": "CAMERA Exposure auto-adjusted"
+  },
+  {
+   "code": "L103",
+   "lang": "ko",
+   "lookbackMin": 10,
+   "poolLines": 48,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 6.8,
+   "reasons": [],
+   "llmTop": "LOADER의 Vacuum pressure low"
+  },
+  {
+   "code": "S301",
+   "lang": "ko",
+   "lookbackMin": 10,
+   "poolLines": 26,
+   "valid": true,
+   "attempts": 2,
+   "firstTry": false,
+   "agree": true,
+   "sec": 11.4,
+   "reasons": [
+    "fake_line",
+    "fake_line"
+   ],
+   "llmTop": "모터 온도가 높음"
+  },
+  {
+   "code": "C401",
+   "lang": "ko",
+   "lookbackMin": 10,
+   "poolLines": 80,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": false,
+   "sec": 6.9,
+   "reasons": [],
+   "llmTop": "CAMERA Exposure auto-adjusted"
+  },
+  {
+   "code": "L104",
+   "lang": "ko",
+   "lookbackMin": 10,
+   "poolLines": 40,
+   "valid": false,
+   "attempts": 2,
+   "firstTry": false,
+   "agree": null,
+   "sec": 9.7,
+   "reasons": [
+    "fake_line",
+    "fake_line",
+    "fake_line"
+   ],
+   "llmTop": null
+  },
+  {
+   "code": "C402",
+   "lang": "ko",
+   "lookbackMin": 30,
+   "poolLines": 53,
+   "valid": true,
+   "attempts": 2,
+   "firstTry": false,
+   "agree": false,
+   "sec": 14.5,
+   "reasons": [
+    "fake_line"
+   ],
+   "llmTop": "CAMERA의 Exposure auto-adjusted(밝기 조절)이 잦은 경우"
+  },
+  {
+   "code": "L103",
+   "lang": "ko",
+   "lookbackMin": 30,
+   "poolLines": 58,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 6.4,
+   "reasons": [],
+   "llmTop": "LOADER Cassette Slot Empty"
+  },
+  {
+   "code": "S301",
+   "lang": "ko",
+   "lookbackMin": 30,
+   "poolLines": 30,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 7.6,
+   "reasons": [],
+   "llmTop": "모터 온도가 높음"
+  },
+  {
+   "code": "C401",
+   "lang": "ko",
+   "lookbackMin": 30,
+   "poolLines": 80,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 10.3,
+   "reasons": [],
+   "llmTop": "CAMERA Exposure auto-adjusted"
+  },
+  {
+   "code": "L104",
+   "lang": "ko",
+   "lookbackMin": 30,
+   "poolLines": 44,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 6.7,
+   "reasons": [],
+   "llmTop": "LOADER의 Vacuum Pressure Low"
+  },
+  {
+   "code": "C402",
+   "lang": "en",
+   "lookbackMin": 5,
+   "poolLines": 39,
+   "valid": true,
+   "attempts": 2,
+   "firstTry": false,
+   "agree": true,
+   "sec": 9.1,
+   "reasons": [
+    "fake_line"
+   ],
+   "llmTop": "CAMERA exposure auto-adjusted"
+  },
+  {
+   "code": "L103",
+   "lang": "en",
+   "lookbackMin": 5,
+   "poolLines": 43,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 3.1,
+   "reasons": [],
+   "llmTop": "Vacuum pressure low"
+  },
+  {
+   "code": "S301",
+   "lang": "en",
+   "lookbackMin": 5,
+   "poolLines": 25,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 4.4,
+   "reasons": [],
+   "llmTop": "Motor temperature exceeding threshold"
+  },
+  {
+   "code": "C401",
+   "lang": "en",
+   "lookbackMin": 5,
+   "poolLines": 80,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 5.3,
+   "reasons": [],
+   "llmTop": "CAMERA exposure auto-adjusted"
+  },
+  {
+   "code": "L104",
+   "lang": "en",
+   "lookbackMin": 5,
+   "poolLines": 40,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 2.6,
+   "reasons": [],
+   "llmTop": "Door open due to operator login"
+  },
+  {
+   "code": "C402",
+   "lang": "en",
+   "lookbackMin": 10,
+   "poolLines": 42,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 5,
+   "reasons": [],
+   "llmTop": "CAMERA exposure auto-adjusted"
+  },
+  {
+   "code": "L103",
+   "lang": "en",
+   "lookbackMin": 10,
+   "poolLines": 48,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 5.2,
+   "reasons": [],
+   "llmTop": "Vacuum pressure low"
+  },
+  {
+   "code": "S301",
+   "lang": "en",
+   "lookbackMin": 10,
+   "poolLines": 26,
+   "valid": true,
+   "attempts": 2,
+   "firstTry": false,
+   "agree": true,
+   "sec": 7.1,
+   "reasons": [
+    "fake_line"
+   ],
+   "llmTop": "Motor temperature exceeding threshold"
+  },
+  {
+   "code": "C401",
+   "lang": "en",
+   "lookbackMin": 10,
+   "poolLines": 80,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": false,
+   "sec": 5,
+   "reasons": [],
+   "llmTop": "CAMERA Exposure auto-adjusted"
+  },
+  {
+   "code": "L104",
+   "lang": "en",
+   "lookbackMin": 10,
+   "poolLines": 40,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 2.5,
+   "reasons": [],
+   "llmTop": "Door open due to operator login"
+  },
+  {
+   "code": "C402",
+   "lang": "en",
+   "lookbackMin": 30,
+   "poolLines": 53,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 4.1,
+   "reasons": [],
+   "llmTop": "Lamp intensity drift"
+  },
+  {
+   "code": "L103",
+   "lang": "en",
+   "lookbackMin": 30,
+   "poolLines": 58,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": true,
+   "sec": 4.3,
+   "reasons": [],
+   "llmTop": "Vacuum pressure low"
+  },
+  {
+   "code": "S301",
+   "lang": "en",
+   "lookbackMin": 30,
+   "poolLines": 30,
+   "valid": false,
+   "attempts": 2,
+   "firstTry": false,
+   "agree": null,
+   "sec": 6.3,
+   "reasons": [
+    "fake_line",
+    "fake_line",
+    "fake_line",
+    "fake_line"
+   ],
+   "llmTop": null
+  },
+  {
+   "code": "C401",
+   "lang": "en",
+   "lookbackMin": 30,
+   "poolLines": 80,
+   "valid": true,
+   "attempts": 2,
+   "firstTry": false,
+   "agree": true,
+   "sec": 9.5,
+   "reasons": [
+    "fake_line",
+    "fake_line"
+   ],
+   "llmTop": "CAMERA Exposure auto-adjusted"
+  },
+  {
+   "code": "L104",
+   "lang": "en",
+   "lookbackMin": 30,
+   "poolLines": 44,
+   "valid": true,
+   "attempts": 1,
+   "firstTry": true,
+   "agree": false,
+   "sec": 2.8,
+   "reasons": [],
+   "llmTop": "Door open due to operator action"
+  }
+ ]
+}

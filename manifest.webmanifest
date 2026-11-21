@@ -1,0 +1,16 @@
+{
+  "name": "설비 로그 분석기 · Equipment Log Analyzer",
+  "short_name": "Log Analyzer",
+  "description": "알람 군집 · 경고→알람 리드 타임 · 근거 줄 원인 후보를 브라우저에서. Alarm clusters, warning-to-alarm lead time and evidence-checked causes in the browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#c00000",
+  "lang": "ko",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

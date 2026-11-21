@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>설비 로그 분석기</title>
+  <meta name="description" content="설비 로그 파일을 브라우저에서 열어 알람을 발생 단위로 묶고, 경고→알람 리드 타임과 근거 줄이 붙은 원인 후보를 보여줍니다. 서버 없이 동작합니다.">
+  <meta name="theme-color" content="#c00000">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="vendor/pretendard/pretendard.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <a class="skip" href="#main" data-i18n="skip">본문으로 건너뛰기</a>
+  <header class="bar">
+    <div class="bar-in">
+      <strong class="app-name"><img src="icons/icon.svg" alt="" width="26" height="26"> <span data-i18n="appName">설비 로그 분석기</span></strong>
+      <label class="sr-only" for="lang" data-i18n="language">언어</label>
+      <select id="lang" class="sel sm"><option value="ko">한국어</option><option value="en">English</option></select>
+      <button class="btn ghost sm icon" type="button" id="theme" data-i18n-attr="aria-label:theme;title:theme" aria-label="화면 테마">◐</button>
+      <button class="btn ghost sm" type="button" id="open-help" data-i18n="help">도움말</button>
+      <button class="btn ghost sm" type="button" id="open-settings" data-i18n="settings">설정</button>
+    </div>
+  </header>
+
+  <main class="page" id="main">
+    <section class="intro">
+      <h1 data-i18n="heroTitle">설비 Down 뒤, 무엇이 먼저 깨졌나</h1>
+      <p data-i18n-html="heroText">수만 줄의 설비 로그에서 알람을 <b>발생 단위로 묶고</b>, 알람 앞에 반복된 경고와 <b>경고→알람 리드 타임</b>을 통계로 찾아, 근거 줄이 붙은 원인 후보를 보여줍니다. 파일은 이 브라우저 밖으로 나가지 않습니다.</p>
+      <ol class="steps-nav">
+        <li><span>1</span><i data-i18n="step1">로그 불러오기</i></li>
+        <li><span>2</span><i data-i18n="step2">알람 군집 · 타임라인</i></li>
+        <li><span>3</span><i data-i18n="step3">직전 경고 · 리드 타임 · 원인 후보</i></li>
+        <li><span>4</span><i data-i18n="step4">현장 검증 (재현 → 비교 → Shadow → 전환)</i></li>
+      </ol>
+    </section>
+
+    <section class="panel source" id="drop" aria-labelledby="src-h">
+      <h2 id="src-h" class="sr-only" data-i18n="sourceTitle">로그 불러오기</h2>
+      <div class="src-row">
+        <div class="src-tabs">
+          <button type="button" id="load-sample" class="on" data-i18n="loadSample">예시 로그 (합성)</button>
+          <label class="file-btn"><span data-i18n="openFile">내 로그 열기</span><input type="file" id="file" accept=".log,.txt,.csv,.tsv,.json,.jsonl,.ndjson,text/plain" class="sr-only"></label>
+          <button type="button" class="link" id="download-sample" data-i18n="downloadSample">예시 로그 내려받기</button>
+        </div>
+        <p class="drop-hint" data-i18n="dropHint">로그 파일을 이 페이지에 끌어다 놓아도 됩니다</p>
+      </div>
+
+      <details class="format" id="read-opts">
+        <summary data-i18n="readOpts">읽기 설정 (형식 · 인코딩 · 시간대)</summary>
+        <div class="opt-grid">
+          <label class="field"><span data-i18n="optFormat">형식</span>
+            <select id="o-format">
+              <option value="auto" data-i18n="fmtAuto">자동 감지</option>
+              <option value="iso" data-i18n="fmtIso">날짜 시각 레벨 [모듈] 메시지 (ISO)</option>
+              <option value="syslog">syslog (RFC 3164 / 5424)</option>
+              <option value="csv" data-i18n="fmtCsv">CSV · TSV (열 지정)</option>
+              <option value="jsonl">JSON Lines</option>
+              <option value="regex" data-i18n="fmtRegex">사용자 정규식</option>
+            </select></label>
+          <label class="field"><span data-i18n="optEncoding">인코딩</span>
+            <select id="o-enc"><option value="auto" data-i18n="encAuto">자동 (UTF-8 → EUC-KR)</option><option value="utf-8">UTF-8</option><option value="euc-kr">EUC-KR (CP949)</option><option value="utf-16le">UTF-16 LE</option></select></label>
+          <label class="field"><span data-i18n="optTz">표시 시간대</span>
+            <select id="o-tz"></select>
+            <small data-i18n="optTzHint">오프셋(Z, +09:00)이 있는 시각만 바꿉니다. 오프셋 없는 시각은 장비 현지 시각 그대로 둡니다.</small></label>
+          <label class="field" data-show="syslog"><span data-i18n="optYear">연도 (RFC 3164 는 연도가 없음)</span><input id="o-year" type="number" min="1990" max="2100"></label>
+          <div class="field-row" data-show="csv">
+            <label class="field"><span data-i18n="csvDelim">구분자</span><select id="o-delim"><option value="auto" data-i18n="auto">자동</option><option value=",">,</option><option value="\t">Tab</option><option value=";">;</option><option value="|">|</option></select></label>
+            <label class="field chk"><input id="o-header" type="checkbox" checked> <span data-i18n="csvHeader">첫 줄은 머리글</span></label>
+            <label class="field"><span data-i18n="colTime">시각 열</span><input id="o-ctime" placeholder="time / 1 / 1+2"></label>
+            <label class="field"><span data-i18n="colLevel">레벨 열</span><input id="o-clevel" placeholder="level / 2"></label>
+            <label class="field"><span data-i18n="colModule">모듈 열</span><input id="o-cmodule" placeholder="module / 3"></label>
+            <label class="field"><span data-i18n="colMsg">메시지 열</span><input id="o-cmsg" placeholder="message / 4"></label>
+            <small class="wide" data-i18n="csvHint">비우면 머리글 이름(time · level · module · message 등)으로 찾습니다. 번호는 1부터, 날짜와 시각이 다른 열이면 1+2.</small>
+          </div>
+          <div class="field-row" data-show="jsonl">
+            <label class="field"><span data-i18n="keyTime">시각 키</span><input id="o-jtime" placeholder="time / @timestamp"></label>
+            <label class="field"><span data-i18n="keyLevel">레벨 키</span><input id="o-jlevel" placeholder="level"></label>
+            <label class="field"><span data-i18n="keyModule">모듈 키</span><input id="o-jmodule" placeholder="module / logger"></label>
+            <label class="field"><span data-i18n="keyMsg">메시지 키</span><input id="o-jmsg" placeholder="msg / message"></label>
+          </div>
+          <label class="field wide" data-show="regex"><span data-i18n="regexLabel">정규식 (이름 그룹 time · msg 필수, level · module 선택)</span>
+            <input id="o-regex" spellcheck="false" placeholder="^(?<time>\S+ \S+) (?<level>\w+) (?<module>\w+): (?<msg>.*)$"></label>
+        </div>
+        <div class="row"><p class="hint" data-i18n="formatEx">예: <code>2026-11-10 09:12:40.000 ALARM [LOADER] L103 Wafer vacuum lost</code></p>
+          <button class="btn sm" type="button" id="reread" data-i18n="reread">이 설정으로 다시 읽기</button></div>
+      </details>
+
+      <div id="progress" class="progress" hidden><div class="bar-track"><span id="progress-bar"></span></div><span id="progress-text" aria-live="polite"></span><button class="btn ghost sm" type="button" id="cancel-read" data-i18n="cancel">취소</button></div>
+      <div id="stats" class="stat-row" aria-live="polite"></div>
+      <details id="bad" class="bad" hidden><summary id="bad-sum"></summary><div id="bad-body"></div></details>
+      <div class="row end export-row" id="export-row" hidden>
+        <span class="hint" data-i18n="exportLabel">내보내기</span>
+        <button class="btn ghost sm" type="button" id="exp-html" data-i18n="expHtml">HTML 보고서</button>
+        <button class="btn ghost sm" type="button" id="exp-csv">CSV</button>
+        <button class="btn ghost sm" type="button" id="exp-json">JSON</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="tl-h">
+      <div class="panel-head">
+        <h2 id="tl-h"><span data-i18n="timeline">타임라인</span> <small data-i18n="timelineHint">드래그로 확대 · 더블클릭으로 전체 · 알람을 누르면 해당 군집으로 · 키보드: ← → + − 0</small></h2>
+        <div class="legend"><span class="lg info"></span><i data-i18n="lgInfo">정보 밀도</i><span class="lg warn"></span><i data-i18n="lgWarn">경고</i><span class="lg alarm"></span><i data-i18n="lgAlarm">알람</i><span class="lg band"></span><i data-i18n="lgBand">선택한 군집의 발생</i>
+          <button class="btn ghost sm" type="button" id="tl-table-toggle" aria-pressed="false" data-i18n="asTable">표로 보기</button></div>
+      </div>
+      <div class="tl-wrap"><canvas id="timeline" tabindex="0" role="img"></canvas><div id="tip" class="tip" hidden></div></div>
+      <div id="tl-table" class="tbl-wrap" hidden></div>
+      <div class="row"><span id="range" class="hint"></span><button class="btn ghost sm" type="button" id="reset-view" data-i18n="resetView">전체 보기</button></div>
+    </section>
+
+    <div class="work">
+      <aside class="panel clusters" aria-labelledby="cl-h">
+        <div class="panel-head"><h2 id="cl-h"><span data-i18n="clusters">알람 군집</span> <small data-i18n="clustersHint">첫 알람이 같은 발생끼리</small></h2></div>
+        <ul id="cluster-list"></ul>
+      </aside>
+      <section class="panel detail" id="detail" aria-live="polite"></section>
+    </div>
+
+    <section class="panel verify" id="verify" aria-labelledby="vf-h">
+      <div class="panel-head">
+        <h2 id="vf-h"><span data-i18n="verifyTitle">현장 검증 절차</span> <small data-i18n="verifyHint">바꾸기 전에 같은 데이터로 확인하고, 새 방법은 옆에서 먼저 돌려 보고, 언제든 되돌립니다</small></h2>
+        <span id="mode-badge" class="badge"></span>
+      </div>
+      <div class="vtabs" role="tablist" aria-labelledby="vf-h">
+        <button role="tab" type="button" id="vt-repro" aria-controls="vp-repro" aria-selected="true"><span>1</span><i data-i18n="vtRepro">재현</i></button>
+        <button role="tab" type="button" id="vt-compare" aria-controls="vp-compare" aria-selected="false" tabindex="-1"><span>2</span><i data-i18n="vtCompare">비교</i></button>
+        <button role="tab" type="button" id="vt-shadow" aria-controls="vp-shadow" aria-selected="false" tabindex="-1"><span>3</span><i>Shadow</i></button>
+        <button role="tab" type="button" id="vt-switch" aria-controls="vp-switch" aria-selected="false" tabindex="-1"><span>4</span><i data-i18n="vtSwitch">전환 · 롤백</i></button>
+      </div>
+      <div role="tabpanel" id="vp-repro" aria-labelledby="vt-repro" class="vpanel"></div>
+      <div role="tabpanel" id="vp-compare" aria-labelledby="vt-compare" class="vpanel" hidden></div>
+      <div role="tabpanel" id="vp-shadow" aria-labelledby="vt-shadow" class="vpanel" hidden></div>
+      <div role="tabpanel" id="vp-switch" aria-labelledby="vt-switch" class="vpanel" hidden></div>
+    </section>
+
+    <section class="panel viewer" aria-labelledby="lv-h">
+      <div class="panel-head">
+        <h2 id="lv-h"><span data-i18n="logTitle">로그</span> <small id="viewer-count"></small></h2>
+        <div class="filters">
+          <label class="sr-only" for="f-level" data-i18n="fLevel">레벨</label>
+          <select id="f-level"><option value="0" data-i18n="allLevels">모든 레벨</option><option value="2" data-i18n="warnUp">경고 이상</option><option value="3" data-i18n="alarmOnly">알람만</option></select>
+          <label class="sr-only" for="f-module" data-i18n="fModule">모듈</label>
+          <select id="f-module"></select>
+          <label class="sr-only" for="f-text" data-i18n="fText">메시지 검색</label>
+          <input id="f-text" type="search" data-i18n-attr="placeholder:searchPh" placeholder="메시지 검색 ( / )">
+        </div>
+      </div>
+      <div id="rows" class="rows" tabindex="0" role="listbox" data-i18n-attr="aria-label:logTitle" aria-label="로그"></div>
+    </section>
+  </main>
+
+  <footer class="foot"><span data-i18n="footer">합성 로그: 가상 검사기 SpotCheck 의 하루 (실제 장비 · 알람 코드와 무관). 데이터는 이 기기에만 저장됩니다.</span> <span id="version"></span></footer>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <dialog id="settings" aria-labelledby="st-h">
+    <form method="dialog" class="dlg">
+      <h2 id="st-h" data-i18n="settings">설정</h2>
+      <fieldset><legend data-i18n="llmSection">LLM (선택 사항 — 없어도 모든 기능이 규칙으로 동작)</legend>
+        <label class="field"><span data-i18n="provider">제공자</span>
+          <select id="s-provider">
+            <option value="anthropic" data-i18n="provAnthropic">Anthropic Claude (본인 API 키)</option>
+            <option value="ollama" data-i18n="provOllama">Ollama (이 PC 의 로컬 모델)</option>
+            <option value="mock" data-i18n="provMock">모의 응답 (오프라인 시연 · 실제 모델 아님)</option>
+          </select></label>
+        <div data-prov="anthropic">
+          <label class="field"><span data-i18n="apiKey">Anthropic API 키</span>
+            <input id="s-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
+            <small data-i18n="apiKeyHint">기본은 이 페이지의 메모리에만 둡니다 (새로고침하면 사라짐). 요청은 브라우저에서 api.anthropic.com 으로 바로 갑니다.</small></label>
+          <label class="field chk"><input id="s-remember" type="checkbox"> <span data-i18n="rememberKey">이 브라우저에 키 저장 (공용 PC 에서는 끄세요)</span></label>
+          <label class="field"><span data-i18n="model">모델</span> <select id="s-model"></select></label>
+        </div>
+        <div data-prov="ollama">
+          <label class="field"><span data-i18n="ollamaUrl">Ollama 주소</span><input id="s-ourl" placeholder="http://localhost:11434"></label>
+          <label class="field"><span data-i18n="ollamaModel">모델 이름</span><input id="s-omodel" placeholder="qwen2.5:7b"></label>
+          <small data-i18n="ollamaHint">브라우저에서 부르려면 Ollama 에 이 페이지 주소를 허용해야 합니다 (OLLAMA_ORIGINS). 도움말 FAQ 참고.</small>
+        </div>
+        <label class="field"><span data-i18n="timeout">시간 제한 (초)</span><input id="s-timeout" type="number" min="10" max="600" step="5"></label>
+      </fieldset>
+      <fieldset><legend data-i18n="maskSection">보내기 전 마스킹</legend>
+        <label class="field chk"><input id="s-mask-builtin" type="checkbox" checked> <span data-i18n="maskBuiltin">기본 규칙: IP · MAC · 메일 · 경로 · id= · lot= · host= · serial= 값</span></label>
+        <label class="field"><span data-i18n="maskCustom">추가 정규식 (한 줄에 하나, 괄호 그룹이 있으면 그 부분만 가림)</span>
+          <textarea id="s-mask-custom" rows="3" spellcheck="false" placeholder="recipe=(\S+)"></textarea></label>
+      </fieldset>
+      <fieldset><legend data-i18n="dataSection">데이터</legend>
+        <div class="row">
+          <button class="btn ghost sm" type="button" id="backup-export" data-i18n="backupExport">백업 내보내기 (JSON)</button>
+          <label class="btn ghost sm file-like"><span data-i18n="backupImport">백업 가져오기</span><input type="file" id="backup-import" accept=".json,application/json" class="sr-only"></label>
+          <button class="btn ghost sm danger" type="button" id="reset-all" data-i18n="resetAll">이 기기의 데이터 모두 지우기</button>
+        </div>
+        <small data-i18n="dataHint">저장 위치: 이 브라우저의 IndexedDB (사례 · 규칙 · 설정 이력 · Shadow 기록 · 마지막 파일). 서버로 보내지 않습니다.</small>
+      </fieldset>
+      <p id="settings-err" class="msg err" role="alert"></p>
+      <div class="row end">
+        <button class="btn ghost" value="cancel" type="submit" data-i18n="close">닫기</button>
+        <button class="btn" id="settings-save" value="save" type="submit" data-i18n="save">저장</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="preview" aria-labelledby="pv-h" class="wide-dlg">
+    <form method="dialog" class="dlg">
+      <h2 id="pv-h" data-i18n="previewTitle">보낼 내용 미리보기</h2>
+      <p id="pv-meta" class="hint"></p>
+      <pre id="pv-text" class="pv" tabindex="0"></pre>
+      <div class="row end">
+        <button class="btn ghost" value="cancel" type="submit" data-i18n="cancel">취소</button>
+        <button class="btn" value="send" type="submit" id="pv-send" data-i18n="send">보내기</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="help" aria-labelledby="hp-h" class="wide-dlg">
+    <form method="dialog" class="dlg">
+      <h2 id="hp-h" data-i18n="help">도움말</h2>
+      <div id="help-body" class="help"></div>
+      <div class="row end"><button class="btn" value="close" type="submit" data-i18n="close">닫기</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="onboard" aria-labelledby="ob-h">
+    <form method="dialog" class="dlg">
+      <h2 id="ob-h" data-i18n="obTitle">처음 오셨나요?</h2>
+      <ol class="ob">
+        <li data-i18n-html="ob1"><b>예시 로그</b>가 이미 열려 있습니다. 왼쪽 군집을 눌러 직전 경고 · 리드 타임 · 원인 후보를 보세요.</li>
+        <li data-i18n-html="ob2"><b>내 로그</b>는 파일을 끌어다 놓으면 됩니다. 형식이 다르면 '읽기 설정'에서 고릅니다.</li>
+        <li data-i18n-html="ob3">과거 Down 발생을 <b>사례로 저장</b>하면 '현장 검증 → 재현'에서 규칙이 몇 분 먼저 잡았는지 계산합니다.</li>
+      </ol>
+      <p class="hint" data-i18n="obPrivacy">파일은 이 브라우저 안에서만 읽고 이 기기에만 저장합니다. LLM 은 선택 사항이며, 보내기 전에 보낼 줄을 보여주고 마스킹합니다.</p>
+      <div class="row end"><button class="btn" value="ok" type="submit" data-i18n="obStart">시작하기</button></div>
+    </form>
+  </dialog>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
