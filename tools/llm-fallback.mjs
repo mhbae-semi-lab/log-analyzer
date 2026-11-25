@@ -1,7 +1,8 @@
 // 실제 모델로 "LLM 검증 실패 시 규칙 대체율"을 잰다 (로컬 Ollama).
 //   node tools/llm-fallback.mjs [모델=qwen2.5:3b] [주소=http://localhost:11434]
 // 예시 로그(합성)의 군집 5개 × 직전 구간 5 · 10 · 30분 × 한/영 = 30회.
-// 앱과 같은 코드 · 기본값(프롬프트 · 마스킹 · 검증 · 1회 재시도 · 시간 제한 90초)을 쓰고, 결과를 docs/measurements/ 에 JSON 으로 남긴다.
+// 앱과 같은 코드(프롬프트 · 마스킹 · 검증 · 1회 재시도)를 쓰고, 결과를 docs/measurements/ 에 JSON 으로 남긴다.
+// 시간 제한은 90초 (기존 측정 조건. 앱 기본값은 1.0.1 부터 600초).
 import { writeFileSync, mkdirSync } from "node:fs";
 import { parseText } from "../src/parse.js";
 import { generate } from "../src/gen.js";

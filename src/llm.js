@@ -101,6 +101,27 @@ const OLLAMA_SCHEMA = structuredClone(OUTPUT_SCHEMA);
 Object.assign(OLLAMA_SCHEMA.properties.causes, { minItems: 1, maxItems: 3 });
 Object.assign(OLLAMA_SCHEMA.properties.causes.items.properties.evidence, { minItems: 1, maxItems: 5 });
 
+// stream:true 로 받아 조각을 모은다. stream:false 는 답을 다 만든 뒤에야 응답 헤더가 와서,
+// 수 분 걸리는 모델(bonsai-2.5:27b)은 시간 제한 설정과 상관없이 응답 헤더 대기 제한(Node fetch 300초 등)에 먼저 끊긴다
+async function readOllamaStream(r) {
+  const reader = r.body.pipeThrough(new TextDecoderStream()).getReader();
+  let buf = "", content = "", model = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (value) buf += value;
+    const lines = buf.split("\n");
+    buf = done ? "" : lines.pop();
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const j = JSON.parse(line);
+      if (j.error) throw new LlmError("api", "Ollama: " + j.error);
+      content += j.message?.content || "";
+      model = j.model || model;
+    }
+    if (done) return { content, model };
+  }
+}
+
 async function callOllama(o) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort("timeout"), o.timeoutS * 1000);
@@ -109,14 +130,14 @@ async function callOllama(o) {
   try {
     const r = await fetch(String(o.ollamaUrl || "http://localhost:11434").replace(/\/+$/, "") + "/api/chat", {
       method: "POST", headers: { "content-type": "application/json" }, signal: ctl.signal,
-      body: JSON.stringify({ model: o.model, stream: false, format: OLLAMA_SCHEMA,
+      body: JSON.stringify({ model: o.model, stream: true, format: OLLAMA_SCHEMA,
         think: false, // thinking 모델(bonsai-2.5 기본 medium)이 생각에 시간 · 토큰을 쓰지 않게. thinking 없는 모델은 그냥 받아들인다
         options: { temperature: 0, num_ctx: 8192, num_predict: 1500 }, // 기본 문맥은 근거 80줄을 다 못 담을 수 있고, 출력이 끝나지 않는 경우를 막는다
         messages: [{ role: "system", content: o.system }, { role: "user", content: o.prompt }] }),
     });
     if (!r.ok) throw new LlmError("api", `Ollama ${r.status}: ${(await r.text()).slice(0, 200)}`);
-    const j = await r.json();
-    return { out: JSON.parse(j.message?.content || "{}"), model: j.model || o.model };
+    const j = await readOllamaStream(r);
+    return { out: JSON.parse(j.content || "{}"), model: j.model || o.model };
   } catch (err) {
     if (ctl.signal.aborted) throw new LlmError(ctl.signal.reason === "timeout" ? "timeout" : "canceled", String(ctl.signal.reason));
     if (err instanceof LlmError) throw err;
