@@ -52,6 +52,23 @@
 - 내보내기: HTML 보고서(단일 파일) · CSV(발생 단위) · JSON(분석 전체).
 - 사용자 매뉴얼: [docs/manual/Log-Analyzer-User-Manual-ko.pdf](docs/manual/Log-Analyzer-User-Manual-ko.pdf)
 
+### Ollama (로컬 LLM)
+
+- 기본 모델은 `bonsai-2.5:27b` (PrismML Ternary Bonsai 2.5 27B, Apache 2.0) 입니다. `ollama pull` 로는 받을 수 없습니다: 공식 `bonsai-2:27b` 는 이전 세대이고, `hf.co/prism-ml/Ternary-Bonsai-2.5-27B-GGUF:Q2_0` 는 일반 Ollama 가 읽지 못하는 PQ2_0 파일을 받습니다 ("unsupported tensor").
+- 만드는 법 (Ollama 0.40.6 이상): [Ternary-Bonsai-2.5-27B-Q2_0.gguf](https://huggingface.co/prism-ml/Ternary-Bonsai-2.5-27B-GGUF/resolve/main/Ternary-Bonsai-2.5-27B-Q2_0.gguf) (7.67GB) 를 받아 같은 폴더에 아래 `Modelfile` 을 두고 `ollama create bonsai-2.5:27b -f Modelfile`
+  ```
+  FROM ./Ternary-Bonsai-2.5-27B-Q2_0.gguf
+  RENDERER qwen3.8
+  PARSER qwen3.5
+  PARAMETER temperature 1
+  PARAMETER top_k 20
+  PARAMETER top_p 0.95
+  PARAMETER min_p 0.05
+  ```
+- 속도 (RTX 3050 4GB · RAM 32GB, 실측 2026-11-25): 생성 약 1.8 토큰/초, 입력 처리 약 64 토큰/초, 처음 불러오기 55~130초. 로그 59줄 군집 하나(입력 2,569토큰 · 출력 204토큰)가 3분 31초 걸려 기본 시간 제한을 600초로 둡니다.
+- 더 빠른 작은 모델을 쓰려면 설정에서 모델 이름만 바꾸면 됩니다 (예: `ollama pull qwen2.5:3b` 뒤 `qwen2.5:3b`). 요청에 `think: false` 를 넣으므로 thinking 모델도 생각 단계 없이 답합니다.
+- 이미 설정을 저장한 브라우저는 저장한 모델 이름 · 시간 제한을 그대로 씁니다.
+
 ### 개발
 
 ```
@@ -105,6 +122,7 @@ python docs/manual/build_manual.py   # 매뉴얼 PPTX 생성 (python-pptx, Pillo
 - Formats: ISO, syslog RFC 3164/5424, CSV/TSV with column mapping, JSON Lines, custom regex; UTF-8 / EUC-KR / UTF-16 detection; unreadable lines listed with line number and reason.
 - Field validation flow: reproduce (saved down cases + three synthetic cases), compare (A/B settings on the same data, changed cells highlighted), shadow (LLM results shown alongside while rules decide), switch and rollback (versioned settings).
 - LLM is optional: your own Anthropic API key (kept in memory by default) or a local Ollama model. Every LLM answer is checked against the cited line numbers and numbers in the evidence; on failure it retries once, then falls back to rule-based causes. Before sending you see the exact prompt with masking applied.
+- Default local model: `bonsai-2.5:27b` (PrismML Ternary Bonsai 2.5 27B, Q2_0 GGUF). `ollama pull` cannot fetch it (the official `bonsai-2:27b` is the previous generation, and the `hf.co/...:Q2_0` tag downloads a PQ2_0 file stock Ollama cannot load), so download the GGUF and run `ollama create bonsai-2.5:27b -f Modelfile` with the Modelfile in the Korean section above (Ollama 0.40.6+). On an RTX 3050 4 GB + 32 GB RAM PC it generates about 1.8 tokens/s and one 59-line cluster took 3 min 31 s, so the default timeout is 600 s. For a faster small model, just change the model name in Settings.
 - Not found among the products surveyed (Nov 2026): lead time per labeled down case as a default result; alarm clusters and prior-warning statistics from a single file in the browser; evidence-checked LLM causes with rule fallback.
 - Live demo: https://mhbae-semi-lab.github.io/log-analyzer/
 - Run locally: `python -m http.server 8731 --bind 127.0.0.1`, tests: `node --test`.

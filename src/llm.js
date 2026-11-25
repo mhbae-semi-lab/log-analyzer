@@ -110,6 +110,7 @@ async function callOllama(o) {
     const r = await fetch(String(o.ollamaUrl || "http://localhost:11434").replace(/\/+$/, "") + "/api/chat", {
       method: "POST", headers: { "content-type": "application/json" }, signal: ctl.signal,
       body: JSON.stringify({ model: o.model, stream: false, format: OLLAMA_SCHEMA,
+        think: false, // thinking 모델(bonsai-2.5 기본 medium)이 생각에 시간 · 토큰을 쓰지 않게. thinking 없는 모델은 그냥 받아들인다
         options: { temperature: 0, num_ctx: 8192, num_predict: 1500 }, // 기본 문맥은 근거 80줄을 다 못 담을 수 있고, 출력이 끝나지 않는 경우를 막는다
         messages: [{ role: "system", content: o.system }, { role: "user", content: o.prompt }] }),
     });

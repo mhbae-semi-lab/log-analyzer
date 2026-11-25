@@ -22,8 +22,8 @@ SHOTS = os.path.join(HERE, "shots")
 ASSETS = os.path.join(HERE, "assets")
 CACHE = os.path.join(HERE, ".cache")
 OUT = os.path.join(HERE, "Log-Analyzer-User-Manual-ko.pptx")
-VERSION = "1.0.0"
-DATE = "2026.11.21"
+VERSION = "1.0.1"
+DATE = "2026.11.25"
 NAME = "설비 로그 분석기"
 MARKS = json.load(open(os.path.join(SHOTS, "marks.json"), encoding="utf-8"))
 DIP = (1280, 800)
@@ -513,11 +513,11 @@ def data():
         "제공자: Anthropic Claude(본인 API 키) · Ollama(이 PC 의 로컬 모델) · 모의 응답(시연)",
         "API 키는 기본적으로 메모리에만. '이 브라우저에 키 저장'을 켤 때만 IndexedDB 에 저장",
     ], "Settings", M("Settings", 0, 1, 2, 3, 4, 5), [
-        ("제공자", "Anthropic · Ollama · 모의 응답"),
+        ("제공자", "Anthropic · Ollama (기본 모델 bonsai-2.5:27b) · 모의 응답"),
         ("API 키", "요청은 브라우저에서 api.anthropic.com 으로 바로 갑니다"),
         ("키 저장", "공용 PC 에서는 끄세요"),
         ("모델", "Claude Opus 5.5 (기본) · Sonnet 5.5 · Haiku 5.5"),
-        ("시간 제한", "기본 90초. 넘으면 그 시도는 실패로 기록"),
+        ("시간 제한", "기본 600초 (로컬 27B 모델 기준). 넘으면 그 시도는 실패로 기록"),
         ("마스킹", "IP · MAC · 메일 · 경로 · id= · lot= · host= · serial= + 추가 정규식"),
     ], tip="Ollama: localhost 로 연 페이지는 그대로 연결, 웹 주소에서는 OLLAMA_ORIGINS 에 그 주소 추가", card_title="설정", desc_size=9.5)
 

@@ -1,5 +1,5 @@
 // 서비스 워커: 앱 파일을 미리 저장해 오프라인에서도 연다. 파일을 바꾸면 VERSION 을 올린다.
-const VERSION = "log-analyzer-v1.0.0-3";
+const VERSION = "log-analyzer-v1.0.1-1";
 const FILES = [
   "./", "index.html", "app.css", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png",
   "src/app.js", "src/analyze.js", "src/parse.js", "src/gen.js", "src/sample-causes.js", "src/i18n.js", "src/store.js", "src/llm.js", "src/export.js", "src/worker.js",

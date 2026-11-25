@@ -1,6 +1,6 @@
 {
   "name": "log-analyzer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Equipment log analyzer PWA: alarm clusters, warning-to-alarm lead time, evidence-checked cause candidates. Runs in the browser, no server.",
   "type": "module",

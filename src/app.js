@@ -8,7 +8,7 @@ import * as db from "./store.js";
 import { MODELS, compileMasks, mask, runValidated } from "./llm.js";
 import { toHtml, toCsv, toJson, download } from "./export.js";
 
-const VERSION = "1.0.0";
+const VERSION = "1.0.1";
 const SAMPLE_NAME = "spotcheck_2026-11-10.log";
 const LOOKBACKS = [2, 5, 10, 30, 60];
 const CRIT = { runs: 5, valid: 0.9, agree: 0.8 };
@@ -27,7 +27,7 @@ const S = {
   eps: [], clusters: [], warns: [], cd: null, sel: null, selEp: 0, view: null, focus: null, highlight: new Set(),
   results: {}, shadowRes: {}, baseChoice: {}, busy: null,
   config: clone(A.DEFAULT_CONFIG), draft: null, history: [], cases: [], caseData: new Map(), shadowLog: [], cmp: null,
-  settings: { lang: "ko", theme: "auto", provider: "anthropic", model: MODELS[0].id, remember: false, ollamaUrl: "http://localhost:11434", ollamaModel: "", timeout: 90, maskBuiltin: true, maskCustom: "" },
+  settings: { lang: "ko", theme: "auto", provider: "anthropic", model: MODELS[0].id, remember: false, ollamaUrl: "http://localhost:11434", ollamaModel: "bonsai-2.5:27b", timeout: 600, maskBuiltin: true, maskCustom: "" },
   apiKey: "", readOpts: { format: "auto", encoding: "auto", tz: -new Date().getTimezoneOffset(), year: new Date().getFullYear(), csv: {}, json: {}, regex: "" },
   file: null, tab: "repro", tlTable: false, cmpChangedOnly: false, shadowDiffOnly: false,
 };
